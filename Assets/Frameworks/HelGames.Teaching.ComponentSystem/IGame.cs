@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="IGame.cs" company="HelGames Company Identifier">
-// Copyright 2014 HelGames Company Identifier. All rights reserved.
+// <copyright file="IGame.cs" company="Paul Schulze (HelGames)">
+// Copyright 2014 Paul Schulze (HelGames). All rights reserved.
 // </copyright>
 // <author>Paul Schulze</author>
 // -----------------------------------------------------------------------

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="LevelEvents.cs" company="HelGames Company Identifier">
-// Copyright 2014 HelGames Company Identifier. All rights reserved.
+// <copyright file="LevelEvents.cs" company="Paul Schulze (HelGames)">
+// Copyright 2014 Paul Schulze (HelGames). All rights reserved.
 // </copyright>
 // <author>Paul Schulze</author>
 // -----------------------------------------------------------------------
