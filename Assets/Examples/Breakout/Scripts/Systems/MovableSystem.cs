@@ -54,6 +54,26 @@ namespace HelGames.Teaching.Breakout
         }
 
         /// <summary>
+        /// Update this systemm. Should the <see cref="BallSystem.Enabled"/> flag be set to <c>true</c>,
+        /// this will move all the <see cref="BallComponent"/> components, using their current velocity.
+        /// </summary>
+        public override void Update()
+        {
+            if (! this.Enabled)
+            {
+                return;
+            }
+
+            foreach (MovableComponent movable in this.Game.ComponentSystem.Components<MovableComponent>())
+            {
+                if (movable.IsMoving)
+                {
+                    this.MoveMovableToPosition(movable, movable.DesiredPosition);
+                }
+            }
+        }
+
+        /// <summary>
         /// Handle ComponentCreated events.
         /// </summary>
         /// <param name="evt">
@@ -65,6 +85,7 @@ namespace HelGames.Teaching.Breakout
             {
                 MovableComponent movable = (MovableComponent)evt.EventData;
                 movable.Rigidbody = movable.gameObject.GetComponent<Rigidbody>();
+                movable.DesiredPosition = movable.gameObject.transform.position;
             }
         }
 
@@ -88,6 +109,20 @@ namespace HelGames.Teaching.Breakout
                 return;
             }
 
+            this.MoveMovableToPosition(movable, data.Position);
+        }
+
+        /// <summary>
+        /// Move the entity, that has the given movable to the desired position.
+        /// </summary>
+        /// <param name="movable">
+        /// The <see cref="MovableComponent"/> movable component of the entity to move.
+        /// </param>
+        /// <param name="position">
+        /// The <see cref="Vector3"/> position to move the entity to.
+        /// </param>
+        private void MoveMovableToPosition(MovableComponent movable, Vector3 target)
+        {
             if (movable == null)
             {
                 // This checks, whether the component is still considered alive by Unity.
@@ -97,7 +132,6 @@ namespace HelGames.Teaching.Breakout
                 return;
             }
 
-            Vector3 target = data.Position;
             Transform transform = movable.gameObject.transform;
             Vector3 movementVector = target - transform.position;
             Collider collider = movable.gameObject.collider;

@@ -22,6 +22,18 @@ namespace HelGames.Teaching.Breakout
         private LayerMask collisionMask;
 
         /// <summary>
+        /// The value indicating whether the movable is moving.
+        /// </summary>
+        [SerializeField]
+        private bool isMoving = false;
+
+        /// <summary>
+        /// The desired location of the movable.
+        /// </summary>
+        [SerializeField]
+        private Vector3 desiredPosition;
+
+        /// <summary>
         /// Gets or sets the layer mask for collisions.
         /// </summary>
         public LayerMask CollisionMask
@@ -34,6 +46,38 @@ namespace HelGames.Teaching.Breakout
             set
             {
                 this.collisionMask = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the value indicating whether the movable is moving.
+        /// </summary>
+        public bool IsMoving
+        {
+            get
+            {
+                return this.isMoving;
+            }
+
+            set
+            {
+                this.isMoving = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the desired location of the movable.
+        /// </summary>
+        public Vector3 DesiredPosition
+        {
+            get
+            {
+                return this.desiredPosition;
+            }
+
+            set
+            {
+                this.desiredPosition = value;
             }
         }
 

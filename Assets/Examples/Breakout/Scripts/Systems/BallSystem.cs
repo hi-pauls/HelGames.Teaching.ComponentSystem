@@ -36,6 +36,7 @@ namespace HelGames.Teaching.Breakout
         {
             base.Initialize(game);
             this.Game.ComponentSystem.RegisterComponentType<BallComponent>();
+            this.Game.ComponentSystem.RegisterComponentType<MovableComponent>();
             this.Game.ComponentSystem.RegisterComponentType<CollidableComponent>();
             this.Game.ComponentSystem.RegisterComponentType<PaddleComponent>();
             this.Game.ComponentSystem.RegisterComponentType<OutComponent>();
@@ -75,10 +76,10 @@ namespace HelGames.Teaching.Breakout
             }
 
             Vector3 position;
-            Vector3 target;
+            MovableComponent movable;
             foreach (BallComponent ball in this.Game.ComponentSystem.Components<BallComponent>())
             {
-                if (ball == null)
+                if ((ball == null) || (! this.Game.ComponentSystem.TryGetComponent(ball.EntityId, out movable)) || movable == null)
                 {
                     // Since we are accessing Unity components here, make sure they are still
                     // alive, as we are treating dead Unity components rather loosely in the
@@ -87,10 +88,7 @@ namespace HelGames.Teaching.Breakout
                 }
 
                 position = ball.gameObject.transform.position;
-                target = position + (ball.Velocity * Time.deltaTime);
-
-                MoveEntityToEventData data = new MoveEntityToEventData(ball.EntityId, target);
-                this.Game.EventManager.QueueEvent(new HelGamesEvent(BreakoutEvents.MoveEntityTo, data));
+                movable.DesiredPosition = position + (ball.Velocity * Time.deltaTime);
             }
         }
 
