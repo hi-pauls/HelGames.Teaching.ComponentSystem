@@ -18,6 +18,11 @@ namespace HelGames.Teaching.Breakout
     public class GUISystem : UnitySystem
     {
         /// <summary>
+        /// The time since the last update, in seconds.
+        /// </summary>
+        private float timeSinceLastUpdate;
+
+        /// <summary>
         /// The text mesh to display the player score in.
         /// </summary>
         [SerializeField]
@@ -95,12 +100,12 @@ namespace HelGames.Teaching.Breakout
             base.Initialize(game);
             this.Game.ComponentSystem.RegisterComponentType<PlayerComponent>();
 
-            this.Game.EventManager.RegisterListener(ComponentSystemEvents.ComponentDestroyed, this.OnComponentDestroyed);
             this.Game.EventManager.RegisterListener(BreakoutEvents.LevelFinished, this.OnLevelFinished);
             this.Game.EventManager.RegisterListener(BreakoutEvents.LevelFailed, this.OnLevelFailed);
             this.Game.EventManager.RegisterListener(BreakoutEvents.LevelLoaded, this.OnLevelLoaded);
             this.Game.EventManager.RegisterListener(BreakoutEvents.GameStarted, this.OnLevelLoaded);
-            this.Game.EventManager.RegisterListener(BreakoutEvents.SpawnBallsForPlayer, this.OnUpdateGuiEvent);
+
+            this.timeSinceLastUpdate = 0.0f;
         }
 
         /// <summary>
@@ -108,27 +113,34 @@ namespace HelGames.Teaching.Breakout
         /// </summary>
         public override void Destroy()
         {
-            this.Game.EventManager.RemoveListener(ComponentSystemEvents.ComponentDestroyed, this.OnComponentDestroyed);
             this.Game.EventManager.RemoveListener(BreakoutEvents.LevelFinished, this.OnLevelFinished);
             this.Game.EventManager.RemoveListener(BreakoutEvents.LevelFailed, this.OnLevelFailed);
             this.Game.EventManager.RemoveListener(BreakoutEvents.LevelLoaded, this.OnLevelLoaded);
             this.Game.EventManager.RemoveListener(BreakoutEvents.GameStarted, this.OnLevelLoaded);
-            this.Game.EventManager.RemoveListener(BreakoutEvents.SpawnBallsForPlayer, this.OnUpdateGuiEvent);
 
             base.Destroy();
         }
 
         /// <summary>
-        /// Handle ComponentDestroyed events.
+        /// Update the UI of the game. This will fetch the score and lives
+        /// values for all players and display it. Currently, only the values
+        /// of the last player are displayed.
         /// </summary>
-        /// <param name="evt">
-        /// The <see cref="IEvent"/> event to handle.
-        /// </param>
-        private void OnComponentDestroyed(IEvent evt)
+        public override void Update()
         {
-            if ((evt.EventData is BallComponent) || (evt.EventData is DestructableComponent))
+            if (this.timeSinceLastUpdate < 0.2f)
             {
-                this.UpdateGUI();
+                // Make this system only run roughly every 200 milliseconds. This will
+                // ensure, that the UI is as up-to-date as necessary, while minimizing
+                // the overhead.
+                this.timeSinceLastUpdate += Time.deltaTime;
+                return;
+            }
+
+            foreach (PlayerComponent player in this.Game.ComponentSystem.Components<PlayerComponent>())
+            {
+                this.LivesText.text = player.Lives.ToString();
+                this.ScoreText.text = player.Score.ToString();
             }
         }
 
@@ -140,7 +152,6 @@ namespace HelGames.Teaching.Breakout
         /// </param>
         private void OnLevelFinished(IEvent evt)
         {
-            this.UpdateGUI();
             this.StateText.gameObject.SetActive(true);
             this.StateText.color = new Color(0.7f, 0.7f, 1.0f);
             this.StateText.text = "Success";
@@ -154,7 +165,6 @@ namespace HelGames.Teaching.Breakout
         /// </param>
         private void OnLevelFailed(IEvent evt)
         {
-            this.UpdateGUI();
             this.StateText.gameObject.SetActive(true);
             this.StateText.color = new Color(1.0f, 0.7f, 0.7f);
             this.StateText.text = "Game Over";
@@ -169,32 +179,6 @@ namespace HelGames.Teaching.Breakout
         private void OnLevelLoaded(IEvent evt)
         {
             this.StateText.gameObject.SetActive(false);
-            this.UpdateGUI();
-        }
-
-        /// <summary>
-        /// Handle UpdateGuiEvent events.
-        /// </summary>
-        /// <param name="evt">
-        /// The <see cref="IEvent"/> event to handle.
-        /// </param>
-        private void OnUpdateGuiEvent(IEvent evt)
-        {
-            this.UpdateGUI();
-        }
-
-        /// <summary>
-        /// Update the UI of the game. This will fetch the score and lives
-        /// values for all players and display it. Currently, only the values
-        /// of the last player are displayed.
-        /// </summary>
-        private void UpdateGUI()
-        {
-            foreach (PlayerComponent player in this.Game.ComponentSystem.Components<PlayerComponent>())
-            {
-                this.LivesText.text = player.Lives.ToString();
-                this.ScoreText.text = player.Score.ToString();
-            }
         }
     }
 }
